@@ -1,0 +1,2660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAMEC - Social Media Platform</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3897f0;
+            --secondary-color: #fafafa;
+            --text-color: #262626;
+            --border-color: #dbdbdb;
+            --dark-bg: #121212;
+            --dark-text: #e0e0e0;
+            --dark-border: #333;
+            --error-color: #ed4956;
+            --success-color: #4BB543;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--secondary-color);
+        }
+
+        body.dark-mode .auth-container {
+            background-color: var(--dark-bg);
+        }
+
+        .auth-box {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .auth-box {
+            background-color: #1e1e1e;
+            border-color: var(--dark-border);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-box h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .auth-box p {
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .auth-box p {
+            color: var(--dark-text);
+        }
+
+        .auth-form .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .auth-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .auth-form label {
+            color: var(--dark-text);
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        body.dark-mode .auth-form input {
+            border-color: var(--dark-border);
+            background-color: #2d2d2d;
+            color: var(--dark-text);
+        }
+
+        .auth-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .auth-form button:hover {
+            opacity: 0.9;
+        }
+
+        .auth-links {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .auth-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #8e8e8e;
+        }
+
+        body.dark-mode .divider {
+            color: #777;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        body.dark-mode .divider::before,
+        body.dark-mode .divider::after {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .divider::before {
+            margin-right: 10px;
+        }
+
+        .divider::after {
+            margin-left: 10px;
+        }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            background-color: white;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .social-btn {
+            border-color: var(--dark-border);
+            background-color: #2d2d2d;
+            color: var(--dark-text);
+        }
+
+        .social-btn i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .google-btn {
+            color: #4285F4;
+        }
+
+        .github-btn {
+            color: #333;
+        }
+
+        body.dark-mode .github-btn {
+            color: #f0f0f0;
+        }
+
+        /* Main App Layout */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .sidebar {
+            background-color: #1e1e1e;
+            border-right-color: var(--dark-border);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        body.dark-mode .sidebar-header {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .sidebar-header h1 {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-left: 10px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        body.dark-mode .sidebar-nav a {
+            color: var(--dark-text);
+        }
+
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background-color: rgba(56, 151, 240, 0.1);
+            color: var(--primary-color);
+        }
+
+        body.dark-mode .sidebar-nav a:hover, 
+        body.dark-mode .sidebar-nav a.active {
+            background-color: rgba(56, 151, 240, 0.2);
+        }
+
+        .sidebar-nav i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            background-color: var(--secondary-color);
+        }
+
+        body.dark-mode .main-content {
+            background-color: var(--dark-bg);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        body.dark-mode .header {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .header h2 {
+            font-size: 24px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .theme-toggle {
+            color: var(--dark-text);
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid var(--primary-color);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            z-index: 100;
+            display: none;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background-color: #2d2d2d;
+            border-color: var(--dark-border);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .dropdown-item {
+            color: var(--dark-text);
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(56, 151, 240, 0.1);
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background-color: rgba(56, 151, 240, 0.2);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 5px 0;
+        }
+
+        body.dark-mode .dropdown-divider {
+            background-color: var(--dark-border);
+        }
+
+        /* Feed */
+        .feed {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .create-post {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        body.dark-mode .create-post {
+            background-color: #1e1e1e;
+            border-color: var(--dark-border);
+        }
+
+        .post-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .post-input img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .post-input textarea {
+            flex: 1;
+            border: none;
+            resize: none;
+            height: 40px;
+            padding: 10px;
+            border-radius: 20px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        body.dark-mode .post-input textarea {
+            background-color: #2d2d2d;
+            color: var(--dark-text);
+        }
+
+        .post-input textarea:focus {
+            outline: none;
+            height: 80px;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .media-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .media-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .media-btn {
+            color: var(--dark-text);
+        }
+
+        .post-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .post-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Posts */
+        .post {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        body.dark-mode .post {
+            background-color: #1e1e1e;
+            border-color: var(--dark-border);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .post-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .post-user {
+            flex: 1;
+        }
+
+        .post-user h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .post-user p {
+            font-size: 12px;
+            color: #8e8e8e;
+        }
+
+        body.dark-mode .post-user p {
+            color: #aaa;
+        }
+
+        .post-more {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .post-more {
+            color: var(--dark-text);
+        }
+
+        .post-content {
+            padding: 0 15px 15px;
+        }
+
+        .post-text {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .post-media {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .post-media img, .post-media video {
+            width: 100%;
+            max-height: 600px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .post-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 15px;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #8e8e8e;
+        }
+
+        body.dark-mode .post-stats {
+            border-top-color: var(--dark-border);
+            border-bottom-color: var(--dark-border);
+            color: #aaa;
+        }
+
+        .post-actions-buttons {
+            display: flex;
+            justify-content: space-around;
+            padding: 0 15px 10px;
+        }
+
+        .post-action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+
+        body.dark-mode .post-action-btn {
+            color: var(--dark-text);
+        }
+
+        .post-action-btn i {
+            margin-right: 5px;
+        }
+
+        .post-action-btn.liked {
+            color: #ed4956;
+        }
+
+        .post-comments {
+            padding: 0 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .comment {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .comment img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .comment-content {
+            flex: 1;
+            background-color: var(--secondary-color);
+            padding: 8px 12px;
+            border-radius: 18px;
+        }
+
+        body.dark-mode .comment-content {
+            background-color: #2d2d2d;
+        }
+
+        .comment-user {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .comment-actions {
+            display: flex;
+            font-size: 12px;
+            margin-top: 5px;
+            color: #8e8e8e;
+        }
+
+        body.dark-mode .comment-actions {
+            color: #aaa;
+        }
+
+        .comment-action {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .add-comment {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        body.dark-mode .add-comment {
+            border-top-color: var(--dark-border);
+        }
+
+        .add-comment input {
+            flex: 1;
+            border: none;
+            background-color: var(--secondary-color);
+            padding: 10px;
+            border-radius: 20px;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .add-comment input {
+            background-color: #2d2d2d;
+            color: var(--dark-text);
+        }
+
+        .add-comment input:focus {
+            outline: none;
+        }
+
+        .add-comment button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        /* Profile Page */
+        .profile-header {
+            display: flex;
+            padding: 30px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        body.dark-mode .profile-header {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 50px;
+            border: 3px solid var(--primary-color);
+        }
+
+        .profile-info h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .profile-stats {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .profile-stat {
+            margin-right: 30px;
+            font-size: 16px;
+        }
+
+        .profile-stat span {
+            font-weight: 600;
+        }
+
+        .profile-bio {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .profile-edit-btn {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 5px 15px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .profile-edit-btn {
+            background-color: #2d2d2d;
+            border-color: var(--dark-border);
+            color: var(--dark-text);
+        }
+
+        .profile-posts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+
+        .profile-post {
+            aspect-ratio: 1;
+            overflow: hidden;
+        }
+
+        .profile-post img, .profile-post video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* Settings Page */
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .settings-card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        body.dark-mode .settings-card {
+            background-color: #1e1e1e;
+            border-color: var(--dark-border);
+        }
+
+        .settings-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        .settings-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .settings-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .settings-form label {
+            color: var(--dark-text);
+        }
+
+        .settings-form input, .settings-form textarea, .settings-form select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        body.dark-mode .settings-form input, 
+        body.dark-mode .settings-form textarea,
+        body.dark-mode .settings-form select {
+            border-color: var(--dark-border);
+            background-color: #2d2d2d;
+            color: var(--dark-text);
+        }
+
+        .settings-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid var(--primary-color);
+        }
+
+        .settings-save-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: #1e1e1e;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        body.dark-mode .modal-header {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        body.dark-mode .modal-close {
+            color: var(--dark-text);
+        }
+
+        .modal-body {
+            padding: 15px;
+        }
+
+        .modal-footer {
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        body.dark-mode .modal-footer {
+            border-top-color: var(--dark-border);
+        }
+
+        .modal-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .modal-btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .modal-btn-secondary {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        body.dark-mode .modal-btn-secondary {
+            background-color: #2d2d2d;
+            border-color: var(--dark-border);
+            color: var(--dark-text);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                padding: 10px;
+            }
+            
+            .sidebar-header h1, .sidebar-nav span {
+                display: none;
+            }
+            
+            .sidebar-nav i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .sidebar-nav a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .profile-stats {
+                justify-content: center;
+            }
+            
+            .profile-posts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .auth-box {
+                border: none;
+                box-shadow: none;
+                max-width: 100%;
+                padding: 20px;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                left: 0;
+                z-index: 100;
+                border-right: none;
+                border-top: 1px solid var(--border-color);
+            }
+            
+            body.dark-mode .sidebar {
+                border-top-color: var(--dark-border);
+            }
+            
+            .sidebar-nav {
+                display: flex;
+                justify-content: space-around;
+            }
+            
+            .sidebar-nav li {
+                margin-bottom: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                margin-bottom: 70px;
+                padding: 15px;
+            }
+            
+            .profile-posts {
+                grid-template-columns: 1fr;
+            }
+            
+            .post-stats {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: var(--success-color);
+        }
+
+        .notification.error {
+            background-color: var(--error-color);
+        }
+
+        .notification i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8e8e8e;
+        }
+
+        body.dark-mode .empty-state {
+            color: #aaa;
+        }
+
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Pages -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-box" id="login-box">
+            <h1>TAMEC</h1>
+            <p>Connect with friends and share your moments</p>
+            
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" id="login-btn">Log In</button>
+            </form>
+            
+            <div class="divider">OR</div>
+            
+            <div class="social-login">
+                <button class="social-btn google-btn" id="google-login">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+                <button class="social-btn github-btn" id="github-login">
+                    <i class="fab fa-github"></i> Continue with GitHub
+                </button>
+            </div>
+            
+            <div class="auth-links">
+                <a href="#" id="forgot-password-link">Forgot password?</a>
+                <span> · </span>
+                <a href="#" id="signup-link">Sign up for TAMEC</a>
+            </div>
+        </div>
+        
+        <div class="auth-box" id="signup-box" style="display: none;">
+            <h1>TAMEC</h1>
+            <p>Sign up to see photos and videos from your friends</p>
+            
+            <form id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" required>
+                </div>
+                <button type="submit" id="signup-btn">Sign Up</button>
+            </form>
+            
+            <div class="divider">OR</div>
+            
+            <div class="social-login">
+                <button class="social-btn google-btn" id="google-signup">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+                <button class="social-btn github-btn" id="github-signup">
+                    <i class="fab fa-github"></i> Continue with GitHub
+                </button>
+            </div>
+            
+            <div class="auth-links">
+                <p>By signing up, you agree to our Terms, Data Policy and Cookies Policy.</p>
+                <a href="#" id="login-link">Already have an account? Log in</a>
+            </div>
+        </div>
+        
+        <div class="auth-box" id="forgot-password-box" style="display: none;">
+            <h1>Reset Password</h1>
+            <p>Enter your email and we'll send you a link to reset your password.</p>
+            
+            <form id="forgot-password-form" class="auth-form">
+                <div class="form-group">
+                    <label for="reset-email">Email</label>
+                    <input type="email" id="reset-email" required>
+                </div>
+                <button type="submit" id="reset-password-btn">Send Reset Link</button>
+            </form>
+            
+            <div class="auth-links">
+                <a href="#" id="back-to-login-link">Back to login</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main App -->
+    <div id="app-container" class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-camera" style="font-size: 24px; color: var(--primary-color);"></i>
+                <h1>TAMEC</h1>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li><a href="#" class="active" id="nav-home"><i class="fas fa-home"></i> <span>Home</span></a></li>
+                <li><a href="#" id="nav-explore"><i class="fas fa-search"></i> <span>Explore</span></a></li>
+                <li><a href="#" id="nav-notifications"><i class="fas fa-heart"></i> <span>Notifications</span></a></li>
+                <li><a href="#" id="nav-messages"><i class="fas fa-envelope"></i> <span>Messages</span></a></li>
+                <li><a href="#" id="nav-profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+                <li><a href="#" id="nav-settings"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Home Feed -->
+            <div id="home-content">
+                <div class="header">
+                    <h2>Home</h2>
+                    <div class="header-actions">
+                        <button class="theme-toggle" id="theme-toggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <div class="user-menu">
+                            <img src="https://via.placeholder.com/150" alt="User Avatar" class="user-avatar" id="user-avatar">
+                            <div class="dropdown-menu" id="dropdown-menu">
+                                <div class="dropdown-item" id="dropdown-profile"><i class="fas fa-user"></i> Profile</div>
+                                <div class="dropdown-item" id="dropdown-settings"><i class="fas fa-cog"></i> Settings</div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" id="dropdown-logout"><i class="fas fa-sign-out-alt"></i> Log Out</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Create Post -->
+                <div class="create-post">
+                    <div class="post-input">
+                        <img src="https://via.placeholder.com/150" alt="User Avatar" id="post-user-avatar">
+                        <textarea id="post-text" placeholder="What's on your mind?"></textarea>
+                    </div>
+                    <div class="post-actions">
+                        <div class="media-buttons">
+                            <button class="media-btn" id="add-photo-btn"><i class="fas fa-image"></i></button>
+                            <button class="media-btn" id="add-video-btn"><i class="fas fa-video"></i></button>
+                        </div>
+                        <button class="post-btn" id="post-submit-btn" disabled>Post</button>
+                    </div>
+                    <input type="file" id="media-upload" accept="image/*,video/*" style="display: none;">
+                </div>
+                
+                <!-- Posts Feed -->
+                <div class="feed" id="posts-feed">
+                    <!-- Posts will be loaded here dynamically -->
+                    <div class="empty-state">
+                        <i class="fas fa-newspaper"></i>
+                        <h3>No posts yet</h3>
+                        <p>Be the first to share something!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Page -->
+            <div id="profile-content" style="display: none;">
+                <div class="header">
+                    <h2>Profile</h2>
+                    <div class="header-actions">
+                        <button class="theme-toggle"><i class="fas fa-moon"></i></button>
+                        <img src="https://via.placeholder.com/150" alt="User Avatar" class="user-avatar">
+                    </div>
+                </div>
+                
+                <div class="profile-header">
+                    <img src="https://via.placeholder.com/150" alt="Profile Avatar" class="profile-avatar" id="profile-page-avatar">
+                    <div class="profile-info">
+                        <h1 id="profile-username">username</h1>
+                        <div class="profile-stats">
+                            <div class="profile-stat"><span id="post-count">0</span> posts</div>
+                            <div class="profile-stat"><span id="follower-count">0</span> followers</div>
+                            <div class="profile-stat"><span id="following-count">0</span> following</div>
+                        </div>
+                        <div class="profile-bio" id="profile-bio">No bio yet.</div>
+                        <button class="profile-edit-btn" id="profile-edit-btn">Edit Profile</button>
+                    </div>
+                </div>
+                
+                <div class="profile-posts" id="profile-posts">
+                    <!-- User posts will be loaded here dynamically -->
+                    <div class="empty-state">
+                        <i class="fas fa-camera"></i>
+                        <h3>No posts yet</h3>
+                        <p>When you share photos and videos, they'll appear here.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Page -->
+            <div id="settings-content" style="display: none;">
+                <div class="header">
+                    <h2>Settings</h2>
+                    <div class="header-actions">
+                        <button class="theme-toggle"><i class="fas fa-moon"></i></button>
+                        <img src="https://via.placeholder.com/150" alt="User Avatar" class="user-avatar">
+                    </div>
+                </div>
+                
+                <div class="settings-container">
+                    <div class="settings-card">
+                        <h3>Account Settings</h3>
+                        <form id="account-settings-form" class="settings-form">
+                            <div class="form-group">
+                                <label for="settings-username">Username</label>
+                                <input type="text" id="settings-username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="settings-email">Email</label>
+                                <input type="email" id="settings-email" required>
+                            </div>
+                            <button type="submit" class="settings-save-btn">Save Changes</button>
+                        </form>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>Profile Information</h3>
+                        <form id="profile-settings-form" class="settings-form">
+                            <div class="form-group">
+                                <label>Profile Picture</label>
+                                <img src="https://via.placeholder.com/150" alt="Profile Picture" class="avatar-preview" id="settings-avatar-preview">
+                                <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                                <button type="button" class="settings-save-btn" id="upload-avatar-btn">Upload New Photo</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="settings-bio">Bio</label>
+                                <textarea id="settings-bio" placeholder="Tell people about yourself"></textarea>
+                            </div>
+                            <button type="submit" class="settings-save-btn">Save Profile</button>
+                        </form>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>Change Password</h3>
+                        <form id="password-settings-form" class="settings-form">
+                            <div class="form-group">
+                                <label for="current-password">Current Password</label>
+                                <input type="password" id="current-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">New Password</label>
+                                <input type="password" id="new-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-new-password">Confirm New Password</label>
+                                <input type="password" id="confirm-new-password" required>
+                            </div>
+                            <button type="submit" class="settings-save-btn">Change Password</button>
+                        </form>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>Theme</h3>
+                        <form id="theme-settings-form" class="settings-form">
+                            <div class="form-group">
+                                <label for="theme-select">Select Theme</label>
+                                <select id="theme-select">
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="post-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Post</h3>
+                <button class="modal-close" id="close-post-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="post-input">
+                    <img src="https://via.placeholder.com/150" alt="User Avatar" id="modal-user-avatar">
+                    <textarea id="modal-post-text" placeholder="What's on your mind?"></textarea>
+                </div>
+                <div id="modal-media-preview" style="margin-top: 15px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="cancel-post-modal">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="confirm-post-modal" disabled>Post</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="edit-profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Profile</h3>
+                <button class="modal-close" id="close-edit-profile-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-profile-form">
+                    <div class="form-group">
+                        <label for="edit-username">Username</label>
+                        <input type="text" id="edit-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-bio">Bio</label>
+                        <textarea id="edit-bio" placeholder="Tell people about yourself"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="cancel-edit-profile-modal">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="save-edit-profile-modal">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">Success!</span>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfXJ-2tmCYo-pQjfN_4nAdxC-NcqfjAlo",
+            authDomain: "tamec-8f9ea.firebaseapp.com",
+            projectId: "tamec-8f9ea",
+            storageBucket: "tamec-8f9ea.appspot.com",
+            messagingSenderId: "372610375354",
+            appId: "1:372610375354:web:1beaff9695e7b49cdeec83",
+            measurementId: "G-W7TT6VTKSP"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        // Firebase providers
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        const githubProvider = new firebase.auth.GithubAuthProvider();
+        
+        // DOM Elements
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        
+        // Auth elements
+        const loginBox = document.getElementById('login-box');
+        const signupBox = document.getElementById('signup-box');
+        const forgotPasswordBox = document.getElementById('forgot-password-box');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        const signupLink = document.getElementById('signup-link');
+        const loginLink = document.getElementById('login-link');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        const backToLoginLink = document.getElementById('back-to-login-link');
+        const googleLoginBtn = document.getElementById('google-login');
+        const githubLoginBtn = document.getElementById('github-login');
+        const googleSignupBtn = document.getElementById('google-signup');
+        const githubSignupBtn = document.getElementById('github-signup');
+        
+        // App elements
+        const themeToggle = document.getElementById('theme-toggle');
+        const userAvatar = document.getElementById('user-avatar');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        const dropdownProfile = document.getElementById('dropdown-profile');
+        const dropdownSettings = document.getElementById('dropdown-settings');
+        const dropdownLogout = document.getElementById('dropdown-logout');
+        
+        // Navigation
+        const navHome = document.getElementById('nav-home');
+        const navExplore = document.getElementById('nav-explore');
+        const navNotifications = document.getElementById('nav-notifications');
+        const navMessages = document.getElementById('nav-messages');
+        const navProfile = document.getElementById('nav-profile');
+        const navSettings = document.getElementById('nav-settings');
+        
+        // Content sections
+        const homeContent = document.getElementById('home-content');
+        const profileContent = document.getElementById('profile-content');
+        const settingsContent = document.getElementById('settings-content');
+        
+        // Post elements
+        const postText = document.getElementById('post-text');
+        const postSubmitBtn = document.getElementById('post-submit-btn');
+        const addPhotoBtn = document.getElementById('add-photo-btn');
+        const addVideoBtn = document.getElementById('add-video-btn');
+        const mediaUpload = document.getElementById('media-upload');
+        const postsFeed = document.getElementById('posts-feed');
+        
+        // Profile elements
+        const profilePageAvatar = document.getElementById('profile-page-avatar');
+        const profileUsername = document.getElementById('profile-username');
+        const profileBio = document.getElementById('profile-bio');
+        const postCount = document.getElementById('post-count');
+        const followerCount = document.getElementById('follower-count');
+        const followingCount = document.getElementById('following-count');
+        const profilePosts = document.getElementById('profile-posts');
+        const profileEditBtn = document.getElementById('profile-edit-btn');
+        
+        // Settings elements
+        const settingsUsername = document.getElementById('settings-username');
+        const settingsEmail = document.getElementById('settings-email');
+        const settingsBio = document.getElementById('settings-bio');
+        const settingsAvatarPreview = document.getElementById('settings-avatar-preview');
+        const uploadAvatarBtn = document.getElementById('upload-avatar-btn');
+        const avatarUpload = document.getElementById('avatar-upload');
+        const themeSelect = document.getElementById('theme-select');
+        
+        // Modals
+        const postModal = document.getElementById('post-modal');
+        const closePostModal = document.getElementById('close-post-modal');
+        const cancelPostModal = document.getElementById('cancel-post-modal');
+        const confirmPostModal = document.getElementById('confirm-post-modal');
+        const modalPostText = document.getElementById('modal-post-text');
+        const modalMediaPreview = document.getElementById('modal-media-preview');
+        const modalUserAvatar = document.getElementById('modal-user-avatar');
+        
+        const editProfileModal = document.getElementById('edit-profile-modal');
+        const closeEditProfileModal = document.getElementById('close-edit-profile-modal');
+        const cancelEditProfileModal = document.getElementById('cancel-edit-profile-modal');
+        const saveEditProfileModal = document.getElementById('save-edit-profile-modal');
+        const editUsername = document.getElementById('edit-username');
+        const editBio = document.getElementById('edit-bio');
+        
+        // Notification
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.getElementById('notification-message');
+        
+        // State variables
+        let currentUser = null;
+        let selectedMediaFile = null;
+        let selectedMediaType = null;
+        let posts = [];
+        let userPosts = [];
+        
+        // Initialize the app
+        function init() {
+            setupEventListeners();
+            checkAuthState();
+            loadThemePreference();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Auth event listeners
+            signupLink.addEventListener('click', showSignup);
+            loginLink.addEventListener('click', showLogin);
+            forgotPasswordLink.addEventListener('click', showForgotPassword);
+            backToLoginLink.addEventListener('click', showLogin);
+            
+            loginForm.addEventListener('submit', handleLogin);
+            signupForm.addEventListener('submit', handleSignup);
+            forgotPasswordForm.addEventListener('submit', handleForgotPassword);
+            
+            googleLoginBtn.addEventListener('click', () => handleSocialLogin(googleProvider));
+            githubLoginBtn.addEventListener('click', () => handleSocialLogin(githubProvider));
+            googleSignupBtn.addEventListener('click', () => handleSocialLogin(googleProvider));
+            githubSignupBtn.addEventListener('click', () => handleSocialLogin(githubProvider));
+            
+            // App event listeners
+            themeToggle.addEventListener('click', toggleTheme);
+            userAvatar.addEventListener('click', toggleDropdown);
+            dropdownProfile.addEventListener('click', navigateToProfile);
+            dropdownSettings.addEventListener('click', navigateToSettings);
+            dropdownLogout.addEventListener('click', handleLogout);
+            
+            // Navigation event listeners
+            navHome.addEventListener('click', (e) => {
+                e.preventDefault();
+                showContent('home');
+                setActiveNav('nav-home');
+            });
+            
+            navExplore.addEventListener('click', (e) => {
+                e.preventDefault();
+                showContent('home'); // Temporary - would be explore content
+                setActiveNav('nav-explore');
+            });
+            
+            navNotifications.addEventListener('click', (e) => {
+                e.preventDefault();
+                showContent('home'); // Temporary - would be notifications content
+                setActiveNav('nav-notifications');
+            });
+            
+            navMessages.addEventListener('click', (e) => {
+                e.preventDefault();
+                showContent('home'); // Temporary - would be messages content
+                setActiveNav('nav-messages');
+            });
+            
+            navProfile.addEventListener('click', (e) => {
+                e.preventDefault();
+                showContent('profile');
+                setActiveNav('nav-profile');
+            });
+            
+            navSettings.addEventListener('click', (e) => {
+                e.preventDefault();
+                showContent('settings');
+                setActiveNav('nav-settings');
+            });
+            
+            // Post event listeners
+            postText.addEventListener('input', togglePostButton);
+            postSubmitBtn.addEventListener('click', handlePostSubmit);
+            addPhotoBtn.addEventListener('click', () => {
+                mediaUpload.accept = 'image/*';
+                mediaUpload.click();
+            });
+            addVideoBtn.addEventListener('click', () => {
+                mediaUpload.accept = 'video/*';
+                mediaUpload.click();
+            });
+            mediaUpload.addEventListener('change', handleMediaUpload);
+            
+            // Profile event listeners
+            profileEditBtn.addEventListener('click', openEditProfileModal);
+            
+            // Settings event listeners
+            uploadAvatarBtn.addEventListener('click', () => avatarUpload.click());
+            avatarUpload.addEventListener('change', handleAvatarUpload);
+            themeSelect.addEventListener('change', handleThemeChange);
+            
+            // Modal event listeners
+            closePostModal.addEventListener('click', closeModal.bind(null, postModal));
+            cancelPostModal.addEventListener('click', closeModal.bind(null, postModal));
+            confirmPostModal.addEventListener('click', confirmPost);
+            modalPostText.addEventListener('input', toggleModalPostButton);
+            
+            closeEditProfileModal.addEventListener('click', closeModal.bind(null, editProfileModal));
+            cancelEditProfileModal.addEventListener('click', closeModal.bind(null, editProfileModal));
+            saveEditProfileModal.addEventListener('click', saveProfileChanges);
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.user-menu') && dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        }
+        
+        // Check auth state
+        function checkAuthState() {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    currentUser = user;
+                    setupUser(user);
+                    showApp();
+                    loadPosts();
+                    loadUserProfile(user.uid);
+                } else {
+                    showAuth();
+                }
+            });
+        }
+        
+        // Show auth screens
+        function showAuth() {
+            authContainer.style.display = 'flex';
+            appContainer.style.display = 'none';
+            showLogin();
+        }
+        
+        // Show app
+        function showApp() {
+            authContainer.style.display = 'none';
+            appContainer.style.display = 'block';
+            showContent('home');
+            setActiveNav('nav-home');
+        }
+        
+        // Show login form
+        function showLogin() {
+            loginBox.style.display = 'block';
+            signupBox.style.display = 'none';
+            forgotPasswordBox.style.display = 'none';
+        }
+        
+        // Show signup form
+        function showSignup() {
+            loginBox.style.display = 'none';
+            signupBox.style.display = 'block';
+            forgotPasswordBox.style.display = 'none';
+        }
+        
+        // Show forgot password form
+        function showForgotPassword() {
+            loginBox.style.display = 'none';
+            signupBox.style.display = 'none';
+            forgotPasswordBox.style.display = 'block';
+        }
+        
+        // Show content section
+        function showContent(section) {
+            homeContent.style.display = 'none';
+            profileContent.style.display = 'none';
+            settingsContent.style.display = 'none';
+            
+            switch (section) {
+                case 'home':
+                    homeContent.style.display = 'block';
+                    break;
+                case 'profile':
+                    profileContent.style.display = 'block';
+                    loadUserProfile(currentUser.uid);
+                    break;
+                case 'settings':
+                    settingsContent.style.display = 'block';
+                    loadSettings();
+                    break;
+            }
+        }
+        
+        // Set active nav item
+        function setActiveNav(navId) {
+            document.querySelectorAll('.sidebar-nav a').forEach(nav => {
+                nav.classList.remove('active');
+            });
+            document.getElementById(navId).classList.add('active');
+        }
+        
+        // Toggle dropdown menu
+        function toggleDropdown() {
+            dropdownMenu.classList.toggle('show');
+        }
+        
+        // Navigate to profile
+        function navigateToProfile() {
+            showContent('profile');
+            setActiveNav('nav-profile');
+            dropdownMenu.classList.remove('show');
+        }
+        
+        // Navigate to settings
+        function navigateToSettings() {
+            showContent('settings');
+            setActiveNav('nav-settings');
+            dropdownMenu.classList.remove('show');
+        }
+        
+        // Setup user
+        function setupUser(user) {
+            // Set user avatar
+            const avatarUrl = user.photoURL || 'https://via.placeholder.com/150';
+            userAvatar.src = avatarUrl;
+            modalUserAvatar.src = avatarUrl;
+            document.getElementById('post-user-avatar').src = avatarUrl;
+            
+            // Set username in profile
+            profileUsername.textContent = user.displayName || user.email.split('@')[0];
+            
+            // Load user data from Firestore
+            db.collection('users').doc(user.uid).get().then(doc => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    if (userData.avatar) {
+                        userAvatar.src = userData.avatar;
+                        modalUserAvatar.src = userData.avatar;
+                        document.getElementById('post-user-avatar').src = userData.avatar;
+                    }
+                    if (userData.username) {
+                        profileUsername.textContent = userData.username;
+                    }
+                    if (userData.bio) {
+                        profileBio.textContent = userData.bio;
+                    }
+                }
+            });
+        }
+        
+        // Handle login
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<div class="spinner"></div>';
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    showNotification('Logged in successfully!', 'success');
+                })
+                .catch((error) => {
+                    showNotification(error.message, 'error');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Log In';
+                });
+        }
+        
+        // Handle signup
+        function handleSignup(e) {
+            e.preventDefault();
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match!', 'error');
+                return;
+            }
+            
+            const signupBtn = document.getElementById('signup-btn');
+            signupBtn.disabled = true;
+            signupBtn.innerHTML = '<div class="spinner"></div>';
+            
+            // First check if username exists
+            db.collection('usernames').doc(username).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        throw new Error('Username already exists');
+                    } else {
+                        return auth.createUserWithEmailAndPassword(email, password);
+                    }
+                })
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    
+                    // Save additional user data
+                    return db.collection('users').doc(user.uid).set({
+                        username: username,
+                        email: email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        // Reserve the username
+                        return db.collection('usernames').doc(username).set({
+                            uid: user.uid
+                        });
+                    });
+                })
+                .then(() => {
+                    showNotification('Account created successfully!', 'success');
+                })
+                .catch((error) => {
+                    showNotification(error.message, 'error');
+                    signupBtn.disabled = false;
+                    signupBtn.textContent = 'Sign Up';
+                });
+        }
+        
+        // Handle forgot password
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            const email = document.getElementById('reset-email').value;
+            
+            const resetBtn = document.getElementById('reset-password-btn');
+            resetBtn.disabled = true;
+            resetBtn.innerHTML = '<div class="spinner"></div>';
+            
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    showNotification('Password reset email sent!', 'success');
+                    resetBtn.disabled = false;
+                    resetBtn.textContent = 'Send Reset Link';
+                    showLogin();
+                })
+                .catch((error) => {
+                    showNotification(error.message, 'error');
+                    resetBtn.disabled = false;
+                    resetBtn.textContent = 'Send Reset Link';
+                });
+        }
+        
+        // Handle social login
+        function handleSocialLogin(provider) {
+            let buttonId;
+            
+            if (provider.providerId === 'google.com') {
+                buttonId = provider === googleProvider ? 'google-login' : 'google-signup';
+            } else {
+                buttonId = provider === githubProvider ? 'github-login' : 'github-signup';
+            }
+            
+            const button = document.getElementById(buttonId);
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner"></div>';
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    
+                    // Check if this is a new user
+                    return db.collection('users').doc(user.uid).get().then(doc => {
+                        if (!doc.exists) {
+                            // New user - save additional data
+                            let username = user.email ? user.email.split('@')[0] : user.uid;
+                            
+                            if (user.displayName) {
+                                username = user.displayName.toLowerCase().replace(/\s+/g, '_');
+                            }
+                            
+                            // Make sure username is unique
+                            return db.collection('usernames').doc(username).get()
+                                .then(usernameDoc => {
+                                    if (usernameDoc.exists) {
+                                        // Append some random characters if username exists
+                                        username = username + '_' + Math.random().toString(36).substring(2, 6);
+                                    }
+                                    
+                                    return db.collection('users').doc(user.uid).set({
+                                        username: username,
+                                        email: user.email,
+                                        avatar: user.photoURL,
+                                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                    }).then(() => {
+                                        return db.collection('usernames').doc(username).set({
+                                            uid: user.uid
+                                        });
+                                    });
+                                });
+                        }
+                    });
+                })
+                .then(() => {
+                    showNotification('Logged in successfully!', 'success');
+                })
+                .catch((error) => {
+                    showNotification(error.message, 'error');
+                    button.disabled = false;
+                    button.innerHTML = provider.providerId === 'google.com' ? 
+                        '<i class="fab fa-google"></i> Continue with Google' : 
+                        '<i class="fab fa-github"></i> Continue with GitHub';
+                });
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            auth.signOut().then(() => {
+                showNotification('Logged out successfully!', 'success');
+            }).catch((error) => {
+                showNotification(error.message, 'error');
+            });
+        }
+        
+        // Toggle theme
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeSelect.value = isDark ? 'dark' : 'light';
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+        
+        // Load theme preference
+        function loadThemePreference() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeSelect.value = 'dark';
+            }
+        }
+        
+        // Handle theme change
+        function handleThemeChange() {
+            if (themeSelect.value === 'dark') {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+        
+        // Toggle post button
+        function togglePostButton() {
+            postSubmitBtn.disabled = postText.value.trim() === '';
+        }
+        
+        // Toggle modal post button
+        function toggleModalPostButton() {
+            confirmPostModal.disabled = modalPostText.value.trim() === '';
+        }
+        
+        // Handle media upload
+        function handleMediaUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            selectedMediaFile = file;
+            selectedMediaType = file.type.startsWith('image') ? 'image' : 'video';
+            
+            // Show modal for post confirmation
+            openModal(postModal);
+            modalPostText.value = postText.value;
+            postText.value = '';
+            toggleModalPostButton();
+            
+            // Preview media
+            modalMediaPreview.innerHTML = '';
+            if (selectedMediaType === 'image') {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.maxWidth = '100%';
+                img.style.borderRadius = '8px';
+                modalMediaPreview.appendChild(img);
+            } else {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                video.style.maxWidth = '100%';
+                video.style.borderRadius = '8px';
+                modalMediaPreview.appendChild(video);
+            }
+        }
+        
+        // Handle avatar upload
+        function handleAvatarUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                settingsAvatarPreview.src = event.target.result;
+                userAvatar.src = event.target.result;
+                modalUserAvatar.src = event.target.result;
+                document.getElementById('post-user-avatar').src = event.target.result;
+                profilePageAvatar.src = event.target.result;
+                
+                // Upload to storage
+                const storageRef = storage.ref(`avatars/${currentUser.uid}`);
+                storageRef.put(file).then(() => {
+                    return storageRef.getDownloadURL();
+                }).then(url => {
+                    // Update user document
+                    return db.collection('users').doc(currentUser.uid).update({
+                        avatar: url
+                    });
+                }).then(() => {
+                    showNotification('Profile picture updated!', 'success');
+                }).catch(error => {
+                    showNotification(error.message, 'error');
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Confirm post
+        function confirmPost() {
+            const text = modalPostText.value.trim();
+            if (!text && !selectedMediaFile) return;
+            
+            confirmPostModal.disabled = true;
+            confirmPostModal.innerHTML = '<div class="spinner"></div>';
+            
+            let mediaUrlPromise = Promise.resolve(null);
+            
+            if (selectedMediaFile) {
+                const storageRef = storage.ref(`posts/${currentUser.uid}/${Date.now()}_${selectedMediaFile.name}`);
+                mediaUrlPromise = storageRef.put(selectedMediaFile).then(() => {
+                    return storageRef.getDownloadURL();
+                });
+            }
+            
+            mediaUrlPromise.then(mediaUrl => {
+                return db.collection('posts').add({
+                    userId: currentUser.uid,
+                    username: currentUser.displayName || currentUser.email.split('@')[0],
+                    userAvatar: currentUser.photoURL || '',
+                    text: text,
+                    mediaUrl: mediaUrl,
+                    mediaType: selectedMediaType,
+                    likes: [],
+                    comments: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }).then(() => {
+                showNotification('Post created successfully!', 'success');
+                closeModal(postModal);
+                confirmPostModal.disabled = false;
+                confirmPostModal.textContent = 'Post';
+                modalPostText.value = '';
+                modalMediaPreview.innerHTML = '';
+                selectedMediaFile = null;
+                selectedMediaType = null;
+                loadPosts();
+            }).catch(error => {
+                showNotification(error.message, 'error');
+                confirmPostModal.disabled = false;
+                confirmPostModal.textContent = 'Post';
+            });
+        }
+        
+        // Handle post submit
+        function handlePostSubmit(e) {
+            e.preventDefault();
+            const text = postText.value.trim();
+            if (!text && !selectedMediaFile) return;
+            
+            // If there's media, we already showed the modal in handleMediaUpload
+            if (selectedMediaFile) return;
+            
+            postSubmitBtn.disabled = true;
+            postSubmitBtn.innerHTML = '<div class="spinner"></div>';
+            
+            db.collection('posts').add({
+                userId: currentUser.uid,
+                username: currentUser.displayName || currentUser.email.split('@')[0],
+                userAvatar: currentUser.photoURL || '',
+                text: text,
+                mediaUrl: null,
+                mediaType: null,
+                likes: [],
+                comments: [],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                showNotification('Post created successfully!', 'success');
+                postText.value = '';
+                postSubmitBtn.disabled = false;
+                postSubmitBtn.textContent = 'Post';
+                loadPosts();
+            }).catch(error => {
+                showNotification(error.message, 'error');
+                postSubmitBtn.disabled = false;
+                postSubmitBtn.textContent = 'Post';
+            });
+        }
+        
+        // Load posts
+        function loadPosts() {
+            postsFeed.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h3>Loading posts...</h3></div>';
+            
+            db.collection('posts')
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then(querySnapshot => {
+                    posts = [];
+                    postsFeed.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        postsFeed.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-newspaper"></i>
+                                <h3>No posts yet</h3>
+                                <p>Be the first to share something!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    querySnapshot.forEach(doc => {
+                        const post = doc.data();
+                        post.id = doc.id;
+                        posts.push(post);
+                        renderPost(post);
+                    });
+                })
+                .catch(error => {
+                    showNotification(error.message, 'error');
+                    postsFeed.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Error loading posts</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        // Load user profile
+        function loadUserProfile(userId) {
+            // Load user data
+            db.collection('users').doc(userId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        profileUsername.textContent = userData.username || 'username';
+                        settingsUsername.value = userData.username || '';
+                        editUsername.value = userData.username || '';
+                        
+                        if (userData.bio) {
+                            profileBio.textContent = userData.bio;
+                            settingsBio.value = userData.bio;
+                            editBio.value = userData.bio;
+                        } else {
+                            profileBio.textContent = 'No bio yet.';
+                            settingsBio.value = '';
+                            editBio.value = '';
+                        }
+                        
+                        if (userData.avatar) {
+                            profilePageAvatar.src = userData.avatar;
+                        }
+                    }
+                    
+                    // Load user posts
+                    return db.collection('posts')
+                        .where('userId', '==', userId)
+                        .orderBy('createdAt', 'desc')
+                        .get();
+                })
+                .then(querySnapshot => {
+                    userPosts = [];
+                    profilePosts.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        profilePosts.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-camera"></i>
+                                <h3>No posts yet</h3>
+                                <p>When you share photos and videos, they'll appear here.</p>
+                            </div>
+                        `;
+                        postCount.textContent = '0';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach(doc => {
+                        const post = doc.data();
+                        post.id = doc.id;
+                        userPosts.push(post);
+                    });
+                    
+                    postCount.textContent = userPosts.length.toString();
+                    
+                    // Render posts grid
+                    profilePosts.innerHTML = '';
+                    userPosts.forEach(post => {
+                        if (post.mediaUrl) {
+                            const postElement = document.createElement('div');
+                            postElement.className = 'profile-post';
+                            
+                            if (post.mediaType === 'image') {
+                                postElement.innerHTML = `<img src="${post.mediaUrl}" alt="Post image">`;
+                            } else {
+                                postElement.innerHTML = `<video src="${post.mediaUrl}" muted></video>`;
+                            }
+                            
+                            profilePosts.appendChild(postElement);
+                        }
+                    });
+                })
+                .catch(error => {
+                    showNotification(error.message, 'error');
+                    profilePosts.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Error loading profile</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                });
+            
+            // Load follower/following counts (placeholder - would implement properly)
+            followerCount.textContent = '0';
+            followingCount.textContent = '0';
+        }
+        
+        // Load settings
+        function loadSettings() {
+            db.collection('users').doc(currentUser.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        settingsUsername.value = userData.username || '';
+                        settingsEmail.value = currentUser.email;
+                        
+                        if (userData.bio) {
+                            settingsBio.value = userData.bio;
+                        }
+                        
+                        if (userData.avatar) {
+                            settingsAvatarPreview.src = userData.avatar;
+                        }
+                    }
+                })
+                .catch(error => {
+                    showNotification(error.message, 'error');
+                });
+        }
+        
+        // Open modal
+        function openModal(modal) {
+            modal.classList.add('show');
+        }
+        
+        // Close modal
+        function closeModal(modal) {
+            modal.classList.remove('show');
+        }
+        
+        // Open edit profile modal
+        function openEditProfileModal() {
+            db.collection('users').doc(currentUser.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        editUsername.value = userData.username || '';
+                        editBio.value = userData.bio || '';
+                    }
+                    openModal(editProfileModal);
+                })
+                .catch(error => {
+                    showNotification(error.message, 'error');
+                });
+        }
+        
+        // Save profile changes
+        function saveProfileChanges() {
+            const username = editUsername.value.trim();
+            const bio = editBio.value.trim();
+            
+            if (!username) {
+                showNotification('Username is required', 'error');
+                return;
+            }
+            
+            saveEditProfileModal.disabled = true;
+            saveEditProfileModal.innerHTML = '<div class="spinner"></div>';
+            
+            // Check if username is changing and if it's available
+            const updates = {
+                bio: bio || null
+            };
+            
+            db.collection('users').doc(currentUser.uid).get()
+                .then(doc => {
+                    const currentUsername = doc.data().username;
+                    
+                    if (username !== currentUsername) {
+                        return db.collection('usernames').doc(username).get()
+                            .then(usernameDoc => {
+                                if (usernameDoc.exists) {
+                                    throw new Error('Username already taken');
+                                } else {
+                                    // First delete the old username reservation
+                                    return db.collection('usernames').doc(currentUsername).delete()
+                                        .then(() => {
+                                            // Reserve the new username
+                                            return db.collection('usernames').doc(username).set({
+                                                uid: currentUser.uid
+                                            });
+                                        })
+                                        .then(() => {
+                                            updates.username = username;
+                                        });
+                                }
+                            });
+                    }
+                })
+                .then(() => {
+                    // Update user document
+                    return db.collection('users').doc(currentUser.uid).update(updates);
+                })
+                .then(() => {
+                    showNotification('Profile updated successfully!', 'success');
+                    closeModal(editProfileModal);
+                    saveEditProfileModal.disabled = false;
+                    saveEditProfileModal.textContent = 'Save';
+                    loadUserProfile(currentUser.uid);
+                })
+                .catch(error => {
+                    showNotification(error.message, 'error');
+                    saveEditProfileModal.disabled = false;
+                    saveEditProfileModal.textContent = 'Save';
+                });
+        }
+        
+        // Render post
+        function renderPost(post) {
+            const postElement = document.createElement('div');
+            postElement.className = 'post';
+            postElement.dataset.id = post.id;
+            
+            let mediaHtml = '';
+            if (post.mediaUrl) {
+                if (post.mediaType === 'image') {
+                    mediaHtml = `<div class="post-media"><img src="${post.mediaUrl}" alt="Post image"></div>`;
+                } else {
+                    mediaHtml = `<div class="post-media"><video src="${post.mediaUrl}" controls></video></div>`;
+                }
+            }
+            
+            const isLiked = post.likes && post.likes.includes(currentUser.uid);
+            const likeBtnClass = isLiked ? 'post-action-btn liked' : 'post-action-btn';
+            
+            postElement.innerHTML = `
+                <div class="post-header">
+                    <img src="${post.userAvatar || 'https://via.placeholder.com/150'}" alt="User avatar">
+                    <div class="post-user">
+                        <h4>${post.username}</h4>
+                        <p>${formatDate(post.createdAt?.toDate())}</p>
+                    </div>
+                    <button class="post-more">⋯</button>
+                </div>
+                <div class="post-content">
+                    <div class="post-text">${post.text}</div>
+                    ${mediaHtml}
+                    <div class="post-stats">
+                        <span>${post.likes?.length || 0} likes</span>
+                        <span>${post.comments?.length || 0} comments</span>
+                    </div>
+                    <div class="post-actions-buttons">
+                        <button class="${likeBtnClass}" data-action="like">
+                            <i class="fas fa-heart"></i> Like
+                        </button>
+                        <button class="post-action-btn" data-action="comment">
+                            <i class="fas fa-comment"></i> Comment
+                        </button>
+                        <button class="post-action-btn" data-action="share">
+                            <i class="fas fa-share"></i> Share
+                        </button>
+                    </div>
+                    <div class="post-comments">
+                        ${renderComments(post.comments)}
+                    </div>
+                    <div class="add-comment">
+                        <input type="text" placeholder="Add a comment...">
+                        <button data-action="post-comment">Post</button>
+                    </div>
+                </div>
+            `;
+            
+            postsFeed.appendChild(postElement);
+            
+            // Add event listeners
+            const likeBtn = postElement.querySelector('[data-action="like"]');
+            const commentBtn = postElement.querySelector('[data-action="comment"]');
+            const postCommentBtn = postElement.querySelector('[data-action="post-comment"]');
+            const commentInput = postElement.querySelector('.add-comment input');
+            
+            likeBtn.addEventListener('click', () => toggleLike(post.id, post.likes || []));
+            commentBtn.addEventListener('click', () => commentInput.focus());
+            postCommentBtn.addEventListener('click', () => addComment(post.id, post.comments || [], commentInput));
+            commentInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addComment(post.id, post.comments || [], commentInput);
+                }
+            });
+        }
+        
+        // Render comments
+        function renderComments(comments) {
+            if (!comments || comments.length === 0) return '';
+            
+            return comments.map(comment => `
+                <div class="comment">
+                    <img src="${comment.userAvatar || 'https://via.placeholder.com/150'}" alt="User avatar">
+                    <div class="comment-content">
+                        <div class="comment-user">${comment.username}</div>
+                        <div class="comment-text">${comment.text}</div>
+                        <div class="comment-actions">
+                            <span class="comment-action">${formatDate(comment.createdAt?.toDate())}</span>
+                            <span class="comment-action">Like</span>
+                            <span class="comment-action">Reply</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Toggle like
+        function toggleLike(postId, currentLikes) {
+            const postRef = db.collection('posts').doc(postId);
+            const isLiked = currentLikes.includes(currentUser.uid);
+            
+            if (isLiked) {
+                // Remove like
+                postRef.update({
+                    likes: firebase.firestore.FieldValue.arrayRemove(currentUser.uid)
+                }).then(() => {
+                    // Update UI
+                    const postElement = document.querySelector(`.post[data-id="${postId}"]`);
+                    if (postElement) {
+                        const likeBtn = postElement.querySelector('[data-action="like"]');
+                        likeBtn.classList.remove('liked');
+                        
+                        const likesCount = postElement.querySelector('.post-stats span:first-child');
+                        const newCount = currentLikes.length - 1;
+                        likesCount.textContent = `${newCount} like${newCount !== 1 ? 's' : ''}`;
+                    }
+                }).catch(error => {
+                    showNotification(error.message, 'error');
+                });
+            } else {
+                // Add like
+                postRef.update({
+                    likes: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+                }).then(() => {
+                    // Update UI
+                    const postElement = document.querySelector(`.post[data-id="${postId}"]`);
+                    if (postElement) {
+                        const likeBtn = postElement.querySelector('[data-action="like"]');
+                        likeBtn.classList.add('liked');
+                        
+                        const likesCount = postElement.querySelector('.post-stats span:first-child');
+                        const newCount = currentLikes.length + 1;
+                        likesCount.textContent = `${newCount} like${newCount !== 1 ? 's' : ''}`;
+                    }
+                }).catch(error => {
+                    showNotification(error.message, 'error');
+                });
+            }
+        }
+        
+        // Add comment
+        function addComment(postId, currentComments, inputElement) {
+            const commentText = inputElement.value.trim();
+            if (!commentText) return;
+            
+            const newComment = {
+                userId: currentUser.uid,
+                username: currentUser.displayName || currentUser.email.split('@')[0],
+                userAvatar: currentUser.photoURL || '',
+                text: commentText,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            const postRef = db.collection('posts').doc(postId);
+            
+            postRef.update({
+                comments: firebase.firestore.FieldValue.arrayUnion(newComment)
+            }).then(() => {
+                // Clear input
+                inputElement.value = '';
+                
+                // Update UI
+                const postElement = document.querySelector(`.post[data-id="${postId}"]`);
+                if (postElement) {
+                    const commentsContainer = postElement.querySelector('.post-comments');
+                    commentsContainer.innerHTML += `
+                        <div class="comment">
+                            <img src="${newComment.userAvatar || 'https://via.placeholder.com/150'}" alt="User avatar">
+                            <div class="comment-content">
+                                <div class="comment-user">${newComment.username}</div>
+                                <div class="comment-text">${newComment.text}</div>
+                                <div class="comment-actions">
+                                    <span class="comment-action">Just now</span>
+                                    <span class="comment-action">Like</span>
+                                    <span class="comment-action">Reply</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const commentsCount = postElement.querySelector('.post-stats span:last-child');
+                    const newCount = currentComments.length + 1;
+                    commentsCount.textContent = `${newCount} comment${newCount !== 1 ? 's' : ''}`;
+                }
+            }).catch(error => {
+                showNotification(error.message, 'error');
+            });
+        }
+        
+        // Format date
+        function formatDate(date) {
+            if (!date) return 'Just now';
+            
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 7) {
+                return date.toLocaleDateString();
+            } else if (days > 0) {
+                return `${days} day${days === 1 ? '' : 's'} ago`;
+            } else if (hours > 0) {
+                return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+            } else if (minutes > 0) {
+                return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+            } else {
+                return 'Just now';
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.className = `notification ${type}`;
+            notificationMessage.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
